@@ -14,10 +14,19 @@ app.use(cors());
 
 
 // DB config 
+const connection_url = 'mongodb+srv://admin:vtni5Zh2MmehSRYv@cluster0.2qoch.mongodb.net/instaDB?retryWrites=true&w=majority'
+mongoose.connect(connection_url, {
+    useCreateIndex: true,
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+})
 
+mongoose.connection.once('open', ()=>{
+    console.log('DB Connected')
+})
 
 // api routes 
-app.get('/', (req, res) => res.status(200).send('Hello world'));
+app.get('/', (req, res) => res.status(200).send('Hello world123'));
 
 // listen
 app.listen(port, ()=> console.log(`listening on localhost:${port}`));
