@@ -6,7 +6,9 @@ import { db, auth } from "./firebase";
 import { Button, Avatar, makeStyles, Modal, Input } from "@material-ui/core";
 import FlipMove from "react-flip-move";
 import InstagramEmbed from "react-instagram-embed";
-import axios from "./axios.js"
+import axios from "./axios.js";
+import Pusher from 'pusher-js';
+
 
 function getModalStyle() {
   const top = 50;
@@ -67,6 +69,26 @@ function App() {
     };
   }, [user, username]);
 
+  const fetchPosts = async () =>
+      await axios.get("/sync").then((response) => {
+        console.log(response);
+        setPosts(response.data);
+        //setPosts(response.data.map(item => item))
+      });
+
+  useEffect(() => {
+    const pusher = new Pusher('00cdf3a7e277efe2f288', {
+      cluster: 'eu'
+    });
+
+    const channel = pusher.subscribe('posts');
+    channel.bind('inserted', (data) => {
+      console.log("data received", data);
+      fetchPosts();
+    });
+
+  }, []);
+
   useEffect(() => {
     // Getting rid of FireBase stuff for mern
     // db.collection("posts")
@@ -74,12 +96,7 @@ function App() {
     //   .onSnapshot((snapshot) =>
     //     setPosts(snapshot.docs.map((doc) => ({ id: doc.id, post: doc.data() })))
     //   );
-    const fetchPosts = async () =>
-      await axios.get("/sync").then((response) => {
-        console.log(response);
-        setPosts(response.data);
-        //setPosts(response.data.map(item => item))
-      });
+    
       fetchPosts();
   }, []);
 
